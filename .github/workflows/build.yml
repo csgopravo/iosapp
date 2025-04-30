@@ -1,41 +1,39 @@
-name: Build iOS WebClip
+name: Build WebClip IPA
 on: [push]
 
 jobs:
   build:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v2
-    
-    - name: Tạo WebClip
-      run: |
-        mkdir -p WebClip.app
-        cat > WebClip.app/Info.plist <<EOL
-        <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-        <plist version="1.0">
-        <dict>
-            <key>CFBundleDisplayName</key>
-            <string>Tai Xiu Tool</string>
-            <key>CFBundleIdentifier</key>
-            <string>com.tenban.taixiu</string>
-            <key>CFBundleVersion</key>
-            <string>1.0</string>
-            <key>MainHTML</key>
-            <string>index.html</string>
-        </dict>
-        </plist>
-        EOL
-        
-        mkdir -p WebClip.app/Resources
-        cp index.html WebClip.app/Resources/
-        
-        # Tạo icon đơn giản (không bắt buộc)
-        convert -size 512x512 xc:blue -fill white -pointsize 72 -gravity center -draw "text 0,0 'TX'" WebClip.app/Resources/icon.png
-        
-        # Nén thành file IPA
-        zip -r WebClip.ipa WebClip.app
-    - uses: actions/upload-artifact@v2
-      with:
-        name: WebClip
-        path: WebClip.ipa
+      - uses: actions/checkout@v4
+      - name: Tạo file IPA
+        run: |
+          # Tạo thư mục WebClip.app
+          mkdir -p WebClip.app
+          
+          # Tạo file Info.plist
+          cat > WebClip.app/Info.plist <<EOL
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>CFBundleDisplayName</key>
+              <string>Tài Xỉu Tool</string>
+              <key>CFBundleIdentifier</key>
+              <string>com.yourname.taixiu</string>
+              <key>CFBundleVersion</key>
+              <string>1.0</string>
+              <key>MainHTML</key>
+              <string>https://username.github.io/repository-name/</string>
+          </dict>
+          </plist>
+          EOL
+          
+          # Nén thành file .ipa
+          zip -r WebClip.ipa WebClip.app
+          
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: WebClip.ipa
+          path: WebClip.ipa
