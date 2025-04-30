@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Tool Tài Xỉu</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .tool-container {
+            position: fixed;
+            top: 50px;
+            left: 50px;
+            width: 250px;
+            background: linear-gradient(90deg, #1298d8, #932db2, #e76aad);
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            padding: 10px;
+            text-align: center;
+            z-index: 9999;
+            user-select: none;
+            border: 1px solid #000000;
+            padding-top: 20px;
+            transform: rotate(+90deg); /* Quay ngược lại để giữ cho nó thẳng đứng */
+        }
+        .logo {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 50px;
+            pointer-events: none;
+            user-select: none;
+        }
+        .header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-bottom: 10px;
+        }
+        .header img {
+            height: 40px;
+        }
+        .header .close-btn {
+            position: absolute;
+            top: -10px;
+            right: -5px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: black;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            border-radius: 50%;
+            cursor: default;
+        }
+        .choices {
+            display: flex;
+            justify-content: space-around;
+            margin: 10px 0;
+            position: relative;
+        }
+        .choice {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: none;
+        }
+        .circle {
+            width: 50px;
+            height: 50px;
+            border: 2px solid white;
+            border-radius: 50%;
+            margin-top: 5px;
+            transition: all 0.3s;
+            background: transparent;
+        }
+        .choice span {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        #tai span {
+            color: rgb(255, 255, 255);
+        }
+
+        #xiu span {
+            color: rgb(255, 255, 255); /* Màu xanh cho XỈU */
+        }
+            .choice.active .circle {
+            background: red;
+            animation: blink 0.5s infinite alternate;
+        }
+        @keyframes blink {
+            from { 
+                background: rgba(255, 0, 0, 0.3);
+                box-shadow: 0 0 5px rgba(255, 0, 0, 0.3); 
+            }
+            to { 
+                background: rgba(255, 0, 0, 1);
+                box-shadow: 0 0 20px rgba(255, 0, 0, 0.8); 
+            }
+        }
+        .footer {
+            font-size: 11px;
+            color: #5d4037;
+            margin-top: 8px;
+        }
+        .tool-label {
+            position: absolute;
+            top: 52px;
+            left: 50%;
+            transform: translate(-50%, -50%) skewX(-20deg);
+            background: black;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 4px 15px;
+            user-select: none;
+            z-index: 5;
+        }
+        .tool-label span {
+            display: inline-block;
+            transform: skewX(20deg);
+        }
+        iframe {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            z-index: -1; /* Đảm bảo iframe không chồng lên các phần khác */
+        }
+    </style>
+</head>
+<body>
+
+<div class="tool-container" id="tool">
+    <img class="logo" src="https://raw.githubusercontent.com/csgopravo/csgopravo.github.io/main/789-logo.png" alt="logo">
+        
+    <div class="header">
+        <div class="close-btn">×</div>
+    </div>
+    
+    <div class="choices">
+        <div class="choice" id="tai">
+            <span>TÀI</span>
+            <div class="circle"></div>
+        </div>
+        <div class="choice" id="xiu">
+            <span>XỈU</span>
+            <div class="circle"></div>
+        </div>
+    </div>
+    
+    <div class="tool-label"><span>TOOL</span></div>
+
+    <div class="footer">created by TUANANH</div>
+</div>
+
+<iframe id="game-iframe" src="https://play.789.club/" allow="autoplay; encrypted-media" frameborder="0"></iframe>
+
+<script>
+    let blinkTimeout = null;
+    let autoInterval = null;
+
+    function autoPick() {
+        const autoChoice = Math.random() < 0.5 ? 'TÀI' : 'XỈU';
+        
+        clearTimeout(blinkTimeout);
+        document.getElementById('tai').classList.remove('active');
+        document.getElementById('xiu').classList.remove('active');
+        
+        if (autoChoice === 'TÀI') {
+            document.getElementById('tai').classList.add('active');
+        } else {
+            document.getElementById('xiu').classList.add('active');
+        }
+
+        // Tắt nhấp nháy sau 10 giây
+        blinkTimeout = setTimeout(() => {
+            document.getElementById('tai').classList.remove('active');
+            document.getElementById('xiu').classList.remove('active');
+        }, 15000);
+    }
+
+    // Bắt đầu tự động nháy ngẫu nhiên sau 10 giây khi trang load
+    setTimeout(() => {
+        autoPick(); // chọn ngay lập tức sau 10 giây
+        autoInterval = setInterval(() => {
+            autoPick();
+        }, 60000);
+    }, 50000);
+
+    dragElement(document.getElementById("tool"));
+
+    function dragElement(elmnt) {
+        let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+        // Sự kiện chuột
+        elmnt.onmousedown = dragMouseDown;
+
+        // Sự kiện cảm ứng cho điện thoại
+        elmnt.ontouchstart = dragTouchStart;
+
+        function dragMouseDown(e) {
+            e = e || window.event;
+            e.preventDefault();
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            document.onmouseup = closeDragElement;
+            document.onmousemove = elementDrag;
+        }
+
+        function dragTouchStart(e) {
+            e = e || window.event;
+            e.preventDefault();
+            pos3 = e.touches[0].clientX;
+            pos4 = e.touches[0].clientY;
+            document.ontouchend = closeDragElement;
+            document.ontouchmove = elementDrag;
+        }
+
+        function elementDrag(e) {
+            e = e || window.event;
+            e.preventDefault();
+            let currentPos1 = 0, currentPos2 = 0;
+
+            if (e.type === 'touchmove') {
+                currentPos1 = e.touches[0].clientX;
+                currentPos2 = e.touches[0].clientY;
+            } else {
+                currentPos1 = e.clientX;
+                currentPos2 = e.clientY;
+            }
+
+            pos1 = pos3 - currentPos1;
+            pos2 = pos4 - currentPos2;
+            pos3 = currentPos1;
+            pos4 = currentPos2;
+
+            elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+            elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+        }
+
+        function closeDragElement() {
+            document.onmouseup = null;
+            document.onmousemove = null;
+            document.ontouchend = null;
+            document.ontouchmove = null;
+        }
+    }
+</script>
+
+</body>
+</html>
